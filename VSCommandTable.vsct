@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable">
+
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+  <Include href="KnownImageIds.vsct"/>
+  <Include href="VSGlobals.vsct"/>
+
+  <Commands package="AddPropertyToBinding">
+    <Groups>
+      <Group guid="AddPropertyToBinding" id="MyMenuGroup" priority="0x0600">
+        <Parent guid="VSMainMenu" id="Tools"/>
+      </Group>
+    </Groups>
+
+    <!--This section defines the elements the user can interact with, like a menu command or a button
+        or combo box in a toolbar. -->
+    <Buttons>
+      <Button guid="AddPropertyToBinding" id="MyCommand" priority="0x0100" type="Button">
+        <Parent guid="AddPropertyToBinding" id="MyMenuGroup" />
+        <Icon guid="ImageCatalogGuid" id="StatusInformation" />
+        <CommandFlag>IconIsMoniker</CommandFlag>
+        <Strings>
+          <ButtonText>Add property to binding</ButtonText>
+          <LocCanonicalName>.Edit.AddPropertyToBinding</LocCanonicalName>
+        </Strings>
+      </Button>
+    </Buttons>
+
+  </Commands>
+
+	<KeyBindings>
+		<KeyBinding guid="AddPropertyToBinding" id="MyCommand" editor="guidVSStd97" key1="Y" mod1="Control Shift" />
+	</KeyBindings>
+
+  <Symbols>
+    <GuidSymbol name="AddPropertyToBinding" value="{95879424-436e-46b8-b1b6-f68024658704}">
+      <IDSymbol name="MyMenuGroup" value="0x0001" />
+      <IDSymbol name="MyCommand" value="0x0100" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>

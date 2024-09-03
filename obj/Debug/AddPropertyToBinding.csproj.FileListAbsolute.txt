@@ -135,3 +135,8 @@ C:\Projects\AddPropertyToBinding\AddPropertyToBinding\obj\Debug\AddPropertyToBin
 C:\Projects\AddPropertyToBinding\AddPropertyToBinding\obj\Debug\extension.vsixmanifest
 C:\Projects\AddPropertyToBinding\AddPropertyToBinding\obj\Debug\files.json
 C:\Projects\AddPropertyToBinding\AddPropertyToBinding\obj\Debug\createTemplateManifests.cache
+C:\Projects\AddPropertyToBinding\AddPropertyToBinding\obj\Debug\Windows\GetTypeWindow.g.cs
+C:\Projects\AddPropertyToBinding\AddPropertyToBinding\obj\Debug\AddPropertyToBinding_MarkupCompile.cache
+C:\Projects\AddPropertyToBinding\AddPropertyToBinding\obj\Debug\AddPropertyToBinding_MarkupCompile.lref
+C:\Projects\AddPropertyToBinding\AddPropertyToBinding\obj\Debug\Windows\GetTypeWindow.baml
+C:\Projects\AddPropertyToBinding\AddPropertyToBinding\obj\Debug\AddPropertyToBinding.g.resources

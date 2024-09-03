@@ -17,12 +17,17 @@ using System.Xml;
 using System.Xml.Linq;
 using Microsoft.VisualStudio.Shell;
 using System;
+using System.Collections.Generic;
+using AddPropertyToBinding.Windows;
+using System.Windows.Markup;
 
 namespace AddPropertyToBinding
 {
     [Command(PackageIds.MyCommand)]
     internal sealed class MyCommand : BaseCommand<MyCommand>
     {
+        private string _propertyType = string.Empty;
+
         protected override async Task ExecuteAsync(OleMenuCmdEventArgs e)
         {
             string nameOfProperty = await GetBindingPropertyName();
@@ -35,25 +40,80 @@ namespace AddPropertyToBinding
                 if (dataContext != null) // DataContext = ViewModel
                 {
                     string activeProjectName = await GetActiveProjectNameAsync();
-                    dataContextPath = CreateProjectPath(xamlFilePath, activeProjectName);
+                    string projPath = CreateProjectPath(xamlFilePath, activeProjectName);
+                    string[] files = Directory.GetFiles(projPath, dataContext + ".cs", SearchOption.AllDirectories);
+                    dataContextPath = files[0];
                 }
                 else // DataContext = this
                 {
                     dataContextPath = xamlFilePath + ".cs";
                 }
-                string dataContextFile = File.ReadAllText(dataContextPath);
-                bool hasPropertyRegion = dataContext.Contains("#region Properties");
-                bool hasFieldRegion = dataContext.Contains("#region Fields");
-                if (!hasFieldRegion) // create fields region
-                {
+                string[] oldDataContextLines = File.ReadAllLines(dataContextPath);
 
-                }
-                if (!hasPropertyRegion) // create properties region
+                //add regex
+                bool hasPropertyRegion = oldDataContextLines.Contains("#region Properties");
+                bool hasFieldRegion = oldDataContextLines.Contains("#region Fields");
+                
+                List<string> newDataContextLines = new List<string>();
+
+                dataContextPath = dataContextPath.Replace("\\", "/");
+                string[] pathTable = dataContextPath.Split('/');
+                string fileName = pathTable[pathTable.Length - 1];
+
+
+                // Get property type
+                using (GetTypeWindow window = new GetTypeWindow(SetPropertyType))
                 {
-                    
+                    window.ShowDialog();
                 }
-                // wrie property after region
+
+                string newLineSign = "\n\r\t\t";
+                bool skipNextLine = false;
+
+                for (int i = 0; i < oldDataContextLines.Length; i++)
+                {
+                    string line = oldDataContextLines[i];
+
+                    if (skipNextLine)
+                    {
+                        skipNextLine = false;
+                        continue;
+                    }
+
+                    newDataContextLines.Add(line);
+
+                    if (!hasFieldRegion && line.Contains(dataContext)) // create fields region
+                    {
+                        newDataContextLines.Add($$"""{{{newLineSign}}#region Fields{{newLineSign}}""" +
+                            $"private {_propertyType} _{nameOfProperty};{newLineSign}" +
+                            $"#endregion{newLineSign}");
+                        hasFieldRegion = true;
+                        skipNextLine = true;
+                    }
+                    if (!hasPropertyRegion && line.Contains(dataContext)) // create properties region
+                    {
+                        newDataContextLines.Add($$"""#region Properties{{newLineSign}}public {{_propertyType}} {{nameOfProperty}}{{newLineSign}}{{{newLineSign}}get => _{{nameOfProperty}};{{newLineSign}}set{{newLineSign}}{{{newLineSign}}_{{nameOfProperty}} = value;{{newLineSign}}OnPropertyChanged();{{newLineSign}}}{{newLineSign}}}{{newLineSign}}#endregion{{newLineSign}}""");
+                        hasPropertyRegion = true;
+                    }
+
+                    if (line.Contains("#region Properties"))
+                    {
+                        newDataContextLines.Add($$"""{{newLineSign}}public {{_propertyType}} {{nameOfProperty}}{{newLineSign}}{{{newLineSign}}get => _{{nameOfProperty}};{{newLineSign}}set{{newLineSign}}{{{newLineSign}}_{{nameOfProperty}} = value;{{newLineSign}}OnPropertyChanged();{{newLineSign}}}{{newLineSign}}}{{newLineSign}}""");
+                    }
+
+                    if (line.Contains("#region Fields"))
+                    {
+                        newDataContextLines.Add($"{newLineSign}private {_propertyType} _{nameOfProperty};{newLineSign}");
+                    }
+                }
+
+                File.WriteAllText(dataContextPath, string.Join("\n", newDataContextLines));
             }
+        }
+
+        private void SetPropertyType(string typeString)
+        {
+            _propertyType = typeString;
         }
 
         private string CreateProjectPath(string filePath, string projectName) 
